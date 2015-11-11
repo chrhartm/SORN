@@ -1,0 +1,83 @@
+#!/usr/bin/env python
+
+import sys
+import subprocess
+from string import Template
+from os.path import basename
+from optparse import OptionParser
+
+#############################################################################
+# Jobscript-Template; see http://docs.python.org/library/string.html#Template
+job_tmpl = Template(
+"""#!/bin/sh
+#SBATCH -p months
+#SBATCH --job-name $JOB_NAME
+#SBATCH --output $JOB_NAME.j%j.txt
+#SBATCH --mail-type ALL
+#SBATCH --mem-per-cpu $MEM
+
+# =============================================================================
+
+echo ------------------------------------------------------------------------------
+echo -n "Starting at "; date
+echo ------------------------------------------------------------------------------
+echo
+
+mpiexec python $PROGRAM $PARAMS
+
+echo
+echo ------------------------------------------------------------------------------
+echo -n "Finished at "; date
+echo ------------------------------------------------------------------------------
+""")
+
+#############################################################################
+# Main
+
+if __name__ == "__main__":
+    parser = OptionParser(usage="usage: %prog [submit-options] <program> <param-file> ...")
+    parser.add_option("-v", "--verbose", action="store_true", dest="verbose")
+    parser.add_option("-c", "--count", dest="count", type="int", default=1)
+    parser.add_option("-m", "--mem-per-cpu", dest="mem", type="string", default="2GB")
+    parser.add_option("-n", "--ntasks", dest="ntasks", default="1", help="ntasks")
+    parser.add_option("-t", "--time", dest="time", default="24:00:00", help="Maximal runtime")
+    
+    options, args = parser.parse_args()
+
+    if len(args) < 1:
+        parser.print_help()
+        parser.error("Incorrect number of argument: Supply a program and parameterfile")
+
+    program = args.pop(0)
+    params = args
+
+    # Check job-name
+    if len(args) == 0:
+        job_name = program
+    else:
+        job_name = basename(params[0])
+
+    # Generate Job-Script
+    subs =  {
+        'OPTIONS': "",
+        'PROGRAM': program,
+        'PARAMS': " ".join(params),
+        'JOB_NAME': job_name,
+        'MEM': options.mem
+    }
+    job_script = job_tmpl.substitute(subs)
+
+    # Verbose
+    if options.verbose:
+        print "Going to submit the following job-file:"
+        print
+        print job_script
+
+    # Run qsub and submit job_script
+    print "Submitting %d job(s) to the job-scheduler..." % options.count
+    for i in xrange(options.count):
+        p = subprocess.Popen(['sbatch', '-n', options.ntasks, "-t", options.time, "--"], stdin=subprocess.PIPE)
+        p.stdin.write(job_script)
+        p.stdin.close()
+        p.communicate()
+
