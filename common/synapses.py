@@ -104,10 +104,14 @@ class AbstractSynapticMatrix(object):
         Performs only the positive part of istdp (see this for details).
         """
         raise NotImplementedError
-    def ss(self):
+    def ss(self, target=None):
         """
         Performs synaptic scaling defined as normalizing all incoming 
         weights to a sum of 1 for each unit
+        
+        Parameters:
+            target: float
+                The target value to be normalized to (if not 1)
         """
         raise NotImplementedError
     def __mul__(self,x):

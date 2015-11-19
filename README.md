@@ -40,4 +40,11 @@ The simulations will always produce more plots than there are in the paper.
 * Fig.7: **c** `chartmann.spont.param_hesselmann` (set eta_stdp to 0 for b and d)
 * Fig.8: `chartmann.spont.param_spont`
 
+## UML
+The following simplified UML diagram sketches the simulation setup:
+![UML-diagram](/doc/SORN_UML.png?raw=true)
+
+When running `test_single.py` with a parameter file, the script will instantiate the *Experiment* specified in the parameters. The *Experiment* then creates *Sources* that specify the stimulation paradigm and *Stats* that record data at every time step. These *Stats* are then collected in a *StatsCollection* that will be an attribute of *Sorn*. Finally, the *Experiment* instantiates a *Sorn* with the parameters from the parameter file. The *Sorn* then instantiates a number of *SynapticMatrices* that can be either sparse or dense and will perform stdp or other plasticity mechanisms as specified in the parameters. After the initialization, the *Experiment* is `run` by the `test_single.py` script and the results are analyzed and plottet according to the `plot_single` method of the *Experiment*. If one runs multiple simulations with `test_cluster.py`, the *Experiment* is `reset` by the script before `run` is called again.
+
+
 

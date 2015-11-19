@@ -1,0 +1,89 @@
+<diagram program="umletino" version="14.0"><zoom_level>10</zoom_level><help_text>Space for diagram notes</help_text><element><id>UMLClass</id><coordinates><x>206</x><y>52</y><w>150</w><h>140</h></coordinates><panel_attributes>/AbstractExperiment/
+--
+...
+--
+start(...)
+reset(Sorn)
+run(Sorn)
+plot_single(...)
+plot_cluster(...)
+...
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>76</x><y>362</y><w>160</w><h>160</h></coordinates><panel_attributes>/AbstractSource/
+--
+...
+--
+next():input
+global_range()
+global_index()
+generate_connection_e(...)
+generate_connection_i(...)
+update_W_eu(...)
+...
+
+
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>336</x><y>362</y><w>190</w><h>210</h></coordinates><panel_attributes>*Sorn*
+--
+stats: StatsCollection
+W_ee: AbstractSynapticMatrix
+W_ei: AbstractSynapticMatrix
+W_ie: AbstractSynapticMatrix
+W_eu: AbstractSynapticMatrix
+W_iu: AbstractSynapticMatrix
+source: AbstractSource
+...
+--
+step(input)
+synaptic_scaling()
+simulation(...)
+...</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>696</x><y>382</y><w>150</w><h>170</h></coordinates><panel_attributes>/AbstractSynapticMatrix/
+--
+...
+--
+prune_weights()
+struct_p()
+stdp(...)
+istdp(...)
+ss(...)
+get_synapses()
+set_synapses(...)
+...</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>146</x><y>602</y><w>100</w><h>30</h></coordinates><panel_attributes>CountingSource</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>36</x><y>602</y><w>90</w><h>30</h></coordinates><panel_attributes>NoSource</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>146</x><y>512</y><w>60</w><h>110</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>10;10;40;90</additional_attributes></element><element><id>Relation</id><coordinates><x>56</x><y>512</y><w>80</w><h>110</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>60;10;10;90</additional_attributes></element><element><id>UMLClass</id><coordinates><x>716</x><y>602</y><w>130</w><h>30</h></coordinates><panel_attributes>SparseSynapticMatrix</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>576</x><y>602</y><w>130</w><h>30</h></coordinates><panel_attributes>FullSynapticMatrix</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>616</x><y>542</y><w>150</w><h>80</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>130;10;10;60</additional_attributes></element><element><id>Relation</id><coordinates><x>796</x><y>542</y><w>30</w><h>80</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>10;10;10;60</additional_attributes></element><element><id>Relation</id><coordinates><x>516</x><y>462</y><w>200</w><h>50</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m1=1
+m2=5
+</panel_attributes><additional_attributes>10;20;180;20</additional_attributes></element><element><id>Relation</id><coordinates><x>226</x><y>432</y><w>130</w><h>40</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;&lt;-
+m1=1
+m2=1</panel_attributes><additional_attributes>110;10;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>646</x><y>47</y><w>100</w><h>150</h></coordinates><panel_attributes>/AbstractStat/
+--
+...
+--
+start(c,obj)
+clear(c,obj)
+add(c,obj)
+report(c,obj)
+...
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>596</x><y>287</y><w>80</w><h>30</h></coordinates><panel_attributes>HistoryStat</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>696</x><y>287</y><w>60</w><h>30</h></coordinates><panel_attributes>ISIStat</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>626</x><y>192</y><w>60</w><h>110</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>40;10;10;90</additional_attributes></element><element><id>Relation</id><coordinates><x>686</x><y>192</y><w>60</w><h>110</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>10;10;40;90</additional_attributes></element><element><id>UMLClass</id><coordinates><x>446</x><y>107</y><w>100</w><h>190</h></coordinates><panel_attributes>StatsCollection
+--
+methods: list
+c: Bunch
+obj: Sorn
+...
+--
+start()
+clear()
+add()
+single_report()
+cluster_report(...)
+...</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>476</x><y>287</y><w>40</w><h>100</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;&lt;-&gt;&gt;&gt;&gt;
+m1=1
+m2=1</panel_attributes><additional_attributes>10;80;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>536</x><y>157</y><w>130</w><h>40</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;&lt;-
+m1=1
+m2=1..*</panel_attributes><additional_attributes>10;10;110;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>770</x><y>287</y><w>70</w><h>30</h></coordinates><panel_attributes>OtherStats</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>726</x><y>192</y><w>110</w><h>120</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>10;10;84;100</additional_attributes></element><element><id>Relation</id><coordinates><x>186</x><y>512</y><w>140</w><h>110</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>10;10;120;90</additional_attributes></element><element><id>Relation</id><coordinates><x>340</x><y>187</y><w>100</w><h>200</h></coordinates><panel_attributes>lt=-
+m1=1
+m2=1
+simulates v</panel_attributes><additional_attributes>10;10;10;175</additional_attributes></element><element><id>Relation</id><coordinates><x>120</x><y>187</y><w>130</w><h>190</h></coordinates><panel_attributes>lt=-
+m1=1
+m2=1..*
+switches
+between v</panel_attributes><additional_attributes>90;10;16;170</additional_attributes></element><element><id>UMLClass</id><coordinates><x>50</x><y>67</y><w>120</w><h>30</h></coordinates><panel_attributes>Experiment_spont</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>50</x><y>117</y><w>140</w><h>30</h></coordinates><panel_attributes>Experiment_hesselmann</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>166</x><y>72</y><w>60</w><h>30</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>40;10;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>146</x><y>172</y><w>80</w><h>30</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>60;10;14;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>50</x><y>167</y><w>110</w><h>30</h></coordinates><panel_attributes>OtherExperiments</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>176</x><y>122</y><w>50</w><h>30</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>30;10;14;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>266</x><y>602</y><w>90</w><h>30</h></coordinates><panel_attributes>OtherSources</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>350</x><y>70</y><w>310</w><h>50</h></coordinates><panel_attributes>lt=-
+m1=1
+m2=1..*
+creates list of &gt;</panel_attributes><additional_attributes>10;20;290;20</additional_attributes></element></diagram>

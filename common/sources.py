@@ -40,14 +40,14 @@ class AbstractSource(object):
                 Number of excitatory units
         """
         raise NotImplementedError
-    def generate_connection_i(self,N_e):
+    def generate_connection_i(self,N_i):
         """
         Generates connection matrix W_iu from input to the inhibitory
         population
         
         Parameters:
-            N_e: int
-                Number of excitatory units
+            N_i: int
+                Number of inhibitory units
         """
         raise NotImplementedError
     def update_W_eu(self,W_eu):
