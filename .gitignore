@@ -1,0 +1,11 @@
+# Ignore Precompiled files #
+*.pyc
+*.pkl
+*.py~
+*.pyo
+# Ignore Logfiles #
+*.txt
+# Ignore Data #
+*.mat
+# Ignore Backup #
+backup/
