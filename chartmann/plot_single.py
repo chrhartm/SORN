@@ -25,14 +25,15 @@ import matplotlib as mpl
 from utils.plotting import pretty_mpl_defaults
 
 # Parameters
-plot_MDS = True # Takes long
+plot_MDS = False # Takes long
 normalize_PCA = False
 use_matlab = False # for FF control and matlab-mds (requires mlabwrap) 
 plot_spikes = True
 ftype = 'pdf' # eps does not support transparency
+pca_animation = False
 
 # Data to plot
-path = r'/home/chartmann/Desktop/sorn/py/backup/test_single/2015-10-28 18-07-18/common'
+path = r'/home/chartmann/Desktop/Meeting Plots/2015-12-08_pcaanimations/nolearning_2015-12-08_11-23-31/common'
 datafile = 'result.h5'
 
 def parallel_stats(W_ee_h,W_ee2_h):
@@ -1338,7 +1339,7 @@ def plot_results(result_path,result):
         utils.saveplot('AvTrans_%s.%s'\
                         %(data.c.stats.file_suffix[0],ftype))
     
-    ### Plot SpontPCA
+### Plot SpontPCA
     #assumption: if spontpattern, then also spikes and indices
     if (data.__contains__('Spikes') and 
         data.__contains__('SpontPattern')):
@@ -1347,6 +1348,15 @@ def plot_results(result_path,result):
         input_spikes = data.Spikes[0][:,0:-steps_noplastic_test]
         spont_spikes = data.Spikes[0][:,-steps_noplastic_test:]
         input_index = data.InputIndex[0][0:-steps_noplastic_test] 
+        
+        filename = os.path.join(pickle_dir,"source_train.pickle")
+        source = pickle.load(gzip.open(filename,"r"))
+        if isinstance(source,TrialSource):
+            source = source.source
+        max_word_length = max([len(x) for x in source.words])
+        N_words = len(source.words)
+        words = source.words
+        words_subscript = [letter for word in words for letter in word]
         
         if data.c.stats.__contains__('only_last'):
             N_comparison = data.c.stats.only_last[0]\
@@ -1378,12 +1388,18 @@ def plot_results(result_path,result):
         (input_pcaed, pcas, var) = pca(last_input_spikes.T)
         
         spont_pcaed = np.dot(last_spont_spikes.T,pcas)
-        savefig_bbox = mpl.rcParams['savefig.bbox']
-        mpl.rcParams['savefig.bbox'] = 'tight'
+        if not pca_animation: # causes the video to be garbage
+            savefig_bbox = mpl.rcParams['savefig.bbox']
+            mpl.rcParams['savefig.bbox'] = 'tight'
         fig = plt.figure()
         ax = fig.add_subplot(111,projection='3d')
-        inputs = N_comparison
-        sponts = 100
+        
+        if not pca_animation:
+            inputs = N_comparison
+            sponts = 100
+        else:
+            inputs = 20 # To get limits roughly right
+            sponts = 0
         
         cmap = plt.cm.Set1 # was jet
         cmaplist = [cmap(i) for i in range(cmap.N)]
@@ -1396,17 +1412,16 @@ def plot_results(result_path,result):
                               spacing='proportional', ticks=bounds[:-1], 
                               boundaries=bounds, format='%1i')    
         if platform.system() == 'Windows':
-            args = {'c':cmap(last_input_index[:inputs].astype('int')
-                        *(256/bounds[-2]),1)}
+            args = {'c':cmap(last_input_index[:inputs].astype('int')*(256/bounds[-2]),1)}
         else:
             args = {'c':last_input_index[:inputs].astype('int'),
                     'cmap':cmap,'norm':norm}
-        ax.scatter(input_pcaed[:inputs,pc_dim[0]],
+        scat = ax.scatter(input_pcaed[:inputs,pc_dim[0]],
                    input_pcaed[:inputs,pc_dim[1]],
                    zs=input_pcaed[:inputs,pc_dim[2]],s=60, **args)
         # dummy plot because 3dscatter not supported by legend
         ax.plot([],[],'o',label='Evoked')
-        ax.plot(spont_pcaed[:sponts,pc_dim[0]],
+        line, = ax.plot(spont_pcaed[:sponts,pc_dim[0]],
                 spont_pcaed[:sponts,pc_dim[1]],
                 zs=spont_pcaed[:sponts,pc_dim[2]],
                 c='b',linewidth=1,label='Spont')
@@ -1427,7 +1442,58 @@ def plot_results(result_path,result):
         ax.set_zticklabels([])
         utils.saveplot('SpontPCA_%s.%s'\
                         %(data.c.stats.file_suffix[0],ftype))
-        mpl.rcParams['savefig.bbox'] = savefig_bbox
+                        
+                        
+        if pca_animation:
+            interval = 100 # in ms
+            N_frames = 50
+            fps = 2
+            from matplotlib import animation
+            from mpl_toolkits.mplot3d.art3d import juggle_axes
+            def init_evoked():
+                ax.view_init(20,100)
+                return scat,
+            def animate_evoked(s):
+                x = input_pcaed[0:s,pc_dim[0]]
+                y = input_pcaed[0:s,pc_dim[1]]
+                z = input_pcaed[0:s,pc_dim[2]]
+                scat._offsets3d = (np.ma.ravel(x), np.ma.ravel(y), 
+                                   np.ma.ravel(z))
+                scat._facecolor3d = scat.to_rgba(
+                                    last_input_index[0:s].astype('int'))
+                #~ ax.view_init(20, 100 + 0.3 * s)
+                draw()
+                return scat,
+            
+            anim = animation.FuncAnimation(fig,animate_evoked,
+                                           init_func=init_evoked,
+                                           interval=interval,
+                                           frames=N_frames)
+            anim.save(utils.logfilename('pca_anim_evoked.mp4'),
+                      writer='avconv', fps=fps)
+            
+            def init_spont():
+                ax.view_init(20,100)
+                return line,
+            def animate_spont(s):
+                x = spont_pcaed[0:s,pc_dim[0]]
+                y = spont_pcaed[0:s,pc_dim[1]]
+                z = spont_pcaed[0:s,pc_dim[2]]
+                line.set_xdata(x)
+                line.set_ydata(y)
+                line.set_3d_properties(z)
+                #~ ax.view_init(20, 100 + 0.3 * s)
+                draw()
+                return line,
+            anim = animation.FuncAnimation(fig,animate_spont,
+                                           init_func=init_spont,
+                                           interval=interval,
+                                           frames=N_frames)
+            anim.save(utils.logfilename('pca_anim_spont.mp4'),
+                      writer='avconv', fps=fps)
+            
+        if not pca_animation:                
+            mpl.rcParams['savefig.bbox'] = savefig_bbox
         # For the rate plots
         if normalize_PCA:
             last_input_spikes *= summed_last_input_spikes
@@ -1451,7 +1517,7 @@ def plot_results(result_path,result):
         xticks(arange(maxindex+1),array([x for x in words_subscript]))
         ylabel('Mean rate')
         utils.saveplot('SpontPCA_Rates_%s.%s'\
-                        %(data.c.stats.file_suffix[0],ftype))        
+                        %(data.c.stats.file_suffix[0],ftype))
     
                    
     ### Plot Bayes
