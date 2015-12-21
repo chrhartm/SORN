@@ -1604,6 +1604,37 @@ class PatternProbabilityStat(AbstractStat):
         # Normalize to probabilities
         self.patterns /= self.patterns.sum(1)[:,None]
         return self.patterns
+        
+class WeeFailureStat(AbstractStat):
+    def __init__(self):
+        self.name = 'weefail'
+        self.collection = 'gather'
+    def clear(self,c,sorn):
+        c.weefail = zeros(sorn.c.N_steps)
+        self.step = 0
+    def add(self,c,sorn):
+        if sorn.c.W_ee.use_sparse:
+            N_weights = sorn.W_ee.W.data.shape[0]
+            N_fail = N_weights-sum(sorn.W_ee.mask)
+        else:
+            N_weights = sum(sorn.W_ee.get_synapses()>0)
+            N_fail = N_weights-sum(sorn.W_ee.masked>0)
+        c.weefail[self.step] = N_fail/N_weights
+        self.step += 1
+    def report(self,c,sorn):
+        return c.weefail
+        
+class WeeFailureFuncStat(AbstractStat):
+    def __init__(self):
+        self.name = 'weefailfunc'
+        self.collection = 'gather'
+    def clear(self,c,sorn):
+        self.x = np.linspace(0,1,1000)
+        self.y = sorn.W_ee.fail_f(self.x)
+    def add(self,c,sorn):
+        pass
+    def report(self,c,sorn):
+        return np.array([self.x,self.y])
 
 # From Philip
 class XClassifierStat(AbstractStat):

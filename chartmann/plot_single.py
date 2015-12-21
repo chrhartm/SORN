@@ -711,7 +711,7 @@ def plot_results(result_path,result):
         (y,_) = histogram(logweight,bins=logbins)
         #fit data to lognormal
         x = logbins[:-1]+(logbins[0]+logbins[1])/2.0
-        semilogx(x,y,'.')
+        semilogx(x,y,'.',label='Data')
         hold('on')
 
         # Do the fitting
@@ -727,11 +727,23 @@ def plot_results(result_path,result):
             popt = [0,0,0]
         curve_x = logspace(-2,0,100)
         fitted_y = lognormal(curve_x,*popt)
-        semilogx(curve_x,fitted_y)
-        #~ title('Final Weight Distribution')
+        semilogx(curve_x,fitted_y,label='Logn. fit')
         xlabel('Weight')
-        ylabel('Frequency')
-        legend(('Data', 'Logn. fit'),loc='best')
+        ylabel('Weight frequency')
+        legend(loc='best')
+        if data.__contains__('weefailfunc'):
+            x_lim = xlim()
+            x_failfunc = data.weefailfunc[0][0]
+            y_failfunc = data.weefailfunc[0][1]
+            ax1 = gca()
+            ax2 = ax1.twinx()
+            ax2.plot(x_failfunc,y_failfunc,'r')
+            ax2.set_ylabel('Failure probability',color='r')
+            for tl in ax2.get_yticklabels():
+                tl.set_color('r')
+            ax2.set_ylim([0,1])
+            xlim(x_lim)
+        #~ title('Final Weight Distribution')
         tight_layout() # throws errors
         utils.saveplot('LogWeights_%s.%s'%\
                                     (data.c.stats.file_suffix[0],ftype))
@@ -2209,7 +2221,7 @@ def plot_results(result_path,result):
             hold('on')
             plot(tmp.T[0],tmp.T[1])
             tight_layout()
-            utils.saveplot('evokedpred_FF_%s.%s'\
+            utils.saveplot('evokedpred_FF_%s.%s'
                             %(data.c.stats.file_suffix[0],ftype))
         
         # Finally plot EP vs. condition at step 1 (indisting. at step0)
@@ -2237,9 +2249,18 @@ def plot_results(result_path,result):
             ylabel('Prediction')
             legend()
             tight_layout()
-            utils.saveplot('evokedpred_fracA_%s.%s'\
+            utils.saveplot('evokedpred_fracA_%s.%s'
                             %(data.c.stats.file_suffix[0],ftype))
-    
+                            
+    if data.__contains__('weefail'):
+        weefail = data.weefail[0]
+        figure()
+        plot(weefail)
+        xlabel('Step')
+        ylabel('Synaptic failure fraction')
+        utils.saveplot('weefail_%s.%s'
+                            %(data.c.stats.file_suffix[0],ftype))
+                            
     if data.__contains__('SVD'):
         print 'plot SVD'
         figure()
@@ -2250,7 +2271,7 @@ def plot_results(result_path,result):
         plot(x,mean(data.SVD[0],1),linewidth=3)
         xlabel('Step')
         ylabel('Singular values')
-        utils.saveplot('SVD_values_%s.%s'\
+        utils.saveplot('SVD_values_%s.%s'
                         %(data.c.stats.file_suffix[0],ftype))
         # Compute Transitions
         filename = os.path.join(pickle_dir,"source_plastic.pickle")

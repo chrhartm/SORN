@@ -127,6 +127,7 @@ for num_local in range(c.cluster.NUMBER_LOCAL):
     sorn.stats = stats
     
     # Run experiments
+    experiment.reset(sorn)
     sorn.stats.start()
     dlog.progress("Start inner loop")
     for n in range(c.N_iterations):

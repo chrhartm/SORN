@@ -286,12 +286,17 @@ class FullSynapticMatrix(AbstractSynapticMatrix):
 
     def __mul__(self,x):
         if self.c.has_key('p_failure') and self.c.p_failure>0:
-            p = self.c.p_failure
             self.oldmasked = self.masked
             self.masked = self.get_synapses()
             nonzero = sum(self.masked>0)
-            self.masked[self.masked>0] *= np.random.choice([0,1],
-                                                      nonzero,p=[p,1-p])
+            if hasattr(self,"fail_f"):
+                p = self.fail_f
+                fails = (p(self.masked[self.masked>0])
+                                            <np.random.rand(nonzero))*1.
+            else:
+                p = self.c.p_failure
+                fails = np.random.choice([0,1],nonzero,p=[p,1-p])*1.
+            self.masked[self.masked>0] *= fails
             return self.masked.dot(x)
         else:
             return self.W.dot(x)
@@ -402,7 +407,6 @@ class SparseSynapticMatrix(AbstractSynapticMatrix):
             return
         if (self.c.has_key('p_failure') and self.c.p_failure>0 and
             any(self.W.data==0)):
-            
             W_tmp = self.W.copy()
             self.mask[self.mask==0] = -1
             self.mask[W_tmp.data==0] = 0
@@ -410,7 +414,6 @@ class SparseSynapticMatrix(AbstractSynapticMatrix):
             W_tmp.eliminate_zeros()
             self.mask = W_tmp.data
             self.mask[self.mask==-1] = 0
-            
         self.W.eliminate_zeros()
 
     # Structural Plasticity
@@ -531,10 +534,16 @@ class SparseSynapticMatrix(AbstractSynapticMatrix):
 
     def __mul__(self,x):
         if self.c.has_key('p_failure') and self.c.p_failure>0:
-            p = self.c.p_failure
+            N_weights = self.W.data.shape[0]
             self.oldmask = self.mask
-            self.mask = np.random.choice([0,1],self.W.data.shape[0],
-                                   p=[p,1.-p])
+            if hasattr(self,"fail_f"):
+                p = self.fail_f
+                self.mask = (p(self.W.data)
+                             <np.random.rand(N_weights))*1.
+            else:
+                p = self.c.p_failure
+                self.mask = (np.random.choice([0,1],
+                             N_weights,p=[p,1.-p]))*1.
             tmpdata = self.W.data.copy()
             self.W.data *= self.mask
             toreturn = self.W * x

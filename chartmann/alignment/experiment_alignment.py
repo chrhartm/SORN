@@ -22,7 +22,9 @@ class Experiment_alignment(AbstractExperiment):
                      ConnectionFractionStat(),
                      WeightHistoryStat('W_ee',record_every_nth=
                                                         c.N_steps/1000),
-                     ParamTrackerStat()
+                     ParamTrackerStat(),
+                     WeeFailureStat(),
+                     WeeFailureFuncStat()
                     ]
         stats_single =  [#CounterStat(),
                          PopulationVariance(),
@@ -46,12 +48,20 @@ class Experiment_alignment(AbstractExperiment):
         stats = sorn.stats # init sets sorn.stats to None
         sorn.__init__(c,self.source)
         sorn.stats = stats
+        if hasattr(self.params,'W_ee_fail_f'):
+            sorn.W_ee.fail_f = self.params.W_ee_fail_f
+            sorn.W_ee_2.fail_f = self.params.W_ee_fail_f
             
     def run(self,sorn):
         super(Experiment_alignment,self).run(sorn)
         c = self.params.c
         
         sorn.simulation(c.N_steps)
+        
+        # Can't dump the function
+        if hasattr(self.params,'W_ee_fail_f'):
+            sorn.W_ee.fail_f = 0
+            sorn.W_ee_2.fail_f = 0
         
         return {'source_plastic':self.source}
      

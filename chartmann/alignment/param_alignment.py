@@ -18,10 +18,13 @@ c.W_ee = utils.Bunch(use_sparse=True,
                      eta_stdp = 0.004,
                      sp_prob = 0.1,
                      bias = 1.0, # pot. bias as strong as depression
-                     p_failure = 0.2,
+                     p_failure = 0.2, # not used if W_ee_fail_f exists
                      eta_ss = 1.0,
                      upper_bound = 1.0,
                      sp_initial=0.001)
+                     
+#~ W_ee_fail_f = lambda x: np.exp(-6*(x+0.2)) # 20% ca
+W_ee_fail_f = lambda x: np.exp(-6*(x+0.1)) # can't be saved in bunch
 
 c.W_ei = utils.Bunch(use_sparse=False,
                      lamb=0.2*c.N_e,
@@ -33,7 +36,7 @@ c.W_ie = utils.Bunch(use_sparse=False,
                      lamb=np.inf,
                      avoid_self_connections=False)
 
-c.steps_plastic = 10000
+c.steps_plastic = 1000000
 c.steps_noplastic_train = 0
 c.steps_noplastic_test = 0
 c.N_steps = c.steps_plastic + c.steps_noplastic_train \
@@ -59,7 +62,7 @@ c.experiment.module = 'chartmann.alignment.experiment_alignment'
 c.experiment.name = 'Experiment_alignment'
 
 #######################################
-c.stats.file_suffix = 'noinput_depbias'
+c.stats.file_suffix = 'noinput_weightdepfail_6_01'
 #######################################
 c.stats.rand_networks = 0
 
@@ -67,8 +70,8 @@ from common.sources import NoSource
 source = NoSource()
 
 # Cluster  
-c.cluster.vary_param = 'W_ee.p_failure'
-c.cluster.params = [0.1,0.2,0.3]
+c.cluster.vary_param = 'W_ee.bias'
+c.cluster.params = [0.75,1.0,1.25]
 if c.imported_mpi:
     c.cluster.NUMBER_OF_SIMS  = len(c.cluster.params)
     c.cluster.NUMBER_OF_CORES = MPI.COMM_WORLD.size

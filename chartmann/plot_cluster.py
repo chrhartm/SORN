@@ -23,7 +23,7 @@ matlab_comparison = True # for FF
 # Figure type (eps,pdf,png,...)
 ftype = 'pdf'
 # Data to plot
-path = r'/home/chartmann/Desktop/Meeting Plots/2015-10-02/hesselmann_withchannelmodel/permute_ambiguous_nooverlap/cluster/0predpos_2015-10-07 17-35-45/common'
+path = r'/home/chartmann/Desktop/Meeting Plots/2015-12-10_weightdepfailure_alignment/cluster_long_06_01_2015-12-09_17-06-48/common'
 datafile = 'result.h5'
  
 '''
@@ -101,6 +101,8 @@ def plot_results(result_path,result):
         param_name_plot = 'prior(%s)'%words[0]
     elif param_name == 'W_ee.p_failure':
         param_name_plot = 'Failure probability'
+    elif param_name == 'W_ee.bias':
+        param_name_plot = 'Pot. bias'
         
     param_name_u = param_name.replace(' ','_')
     
@@ -472,7 +474,7 @@ def plot_results(result_path,result):
         x = linspace(0,data.c.N_steps[0],shape(W_ee_hs)[2])
         for (i,p) in enumerate(params):
             errorspan(x,mean(cvs[:,i],0),std(cvs[:,i],0),
-                                      label=param_name_plot+" = %.1f"%p)
+                                      label=param_name_plot+" = %.2f"%p)
         plot([x[0],x[-1]],[0.083,0.083],'--k',
                                         label='CV from [Bartol et al.]')
         ylabel('Median CV between weight pairs')
@@ -482,6 +484,26 @@ def plot_results(result_path,result):
         tight_layout()
         utils.saveplot('DoubleSynapses_CV_%s.%s'\
                         %(data.c.stats.file_suffix[0],ftype))
+                        
+    if data.__contains__('weefail'):
+        weefail = data.weefail
+        N_steps = data.c.N_steps[0]
+        x = arange(N_steps)
+        N_points = 1000
+        spacing = data.c.steps_plastic[0]//N_points
+        figure()
+        for (i,p) in enumerate(params):
+            errorspan(x[::spacing],mean(weefail[:,i,::spacing],0),
+                      std(weefail[:,i,::spacing],0)/N_iterations,
+                      label=param_name_plot+" = %.2f"%p)
+        xlabel('Step')
+        ylabel('Synaptic failure fraction')
+        xlim([x[0]-0.05*x[-1],x[-1]])
+        legend(loc='best')
+        tight_layout()
+        utils.saveplot('weefail_%s.%s'
+                            %(data.c.stats.file_suffix[0],ftype))
+                            
     ### Plot WeightLifetime
     if False and data.__contains__('WeightLifetime') and \
        any(data.WeightLifetime[0][:] > 0):
@@ -1466,9 +1488,7 @@ def plot_results(result_path,result):
         utils.saveplot('attractor_%s_%s_%.2f.%s'
                         %(data.c.stats.file_suffix[0],param_name_u,
                           params[i],ftype))
-    
-
-
+                          
     # Plot evoked pred vs. FF (high FF should yield better ep)
     # first normalize each iteration and param
     if data.__contains__('EvokedPred') and 'FF' in locals():
