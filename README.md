@@ -28,7 +28,7 @@ Apart from running single experiments, you can also explore parameters with MPI 
 
 Please note that the code is written in such a way that `N_JOBS` has to match the number of different parameters to be explored (`c.cluster.params` in the parameter files).
 
-## Parameter files for [Hartmann2015](http://biorxiv.org/content/early/2014/11/10/011296)
+## Parameter files for [Hartmann2015](http://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1004640)
 The simulations will always produce more plots than there are in the paper.
 
 **c** indicates cluster simulations. Most also return plots for single experiments.
@@ -39,6 +39,14 @@ The simulations will always produce more plots than there are in the paper.
 * Fig.5: **c** `chartmann.spont.param_hesselmann`
 * Fig.7: **c** `chartmann.spont.param_hesselmann` (set eta_stdp to 0 for b and d)
 * Fig.8: `chartmann.spont.param_spont`
+
+## Parameter files for [Hartmann2016](http://journal.frontiersin.org/article/10.3389/fncir.2015.00090/)
+* Fig.1: see notebook `chartmann/alignment/kesten_notebbok/kesten_process_alignment.ipynb`
+* Fig.2: see Fig.1
+* Fig.3: see code at [http://fias.uni-frankfurt.de/~miner/](http://fias.uni-frankfurt.de/~miner/)
+* Fig.4: `chartmann.alignment.param_alignment_potbias`
+* Fig.5: `chartmann.alignment.param_alignment_depbias`
+* Fig.6: see Fig.4 and Fig.5
 
 ## UML
 The following simplified UML diagram sketches the simulation setup:

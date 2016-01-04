@@ -17,14 +17,13 @@ c.W_ee = utils.Bunch(use_sparse=True,
                      avoid_self_connections=True,
                      eta_stdp = 0.004,
                      sp_prob = 0.1,
-                     bias = 1.0, # pot. bias as strong as depression
+                     bias = 1.0, # no bias
                      p_failure = 0.2, # not used if W_ee_fail_f exists
                      eta_ss = 1.0,
                      upper_bound = 1.0,
                      sp_initial=0.001)
                      
-#~ W_ee_fail_f = lambda x: np.exp(-6*(x+0.2)) # 20% ca
-W_ee_fail_f = lambda x: np.exp(-6*(x+0.1)) # can't be saved in bunch
+W_ee_fail_f = lambda x: np.exp(-6*(x+0.1)) # weight-dependent failure
 
 c.W_ei = utils.Bunch(use_sparse=False,
                      lamb=0.2*c.N_e,
@@ -62,7 +61,7 @@ c.experiment.module = 'chartmann.alignment.experiment_alignment'
 c.experiment.name = 'Experiment_alignment'
 
 #######################################
-c.stats.file_suffix = 'noinput_weightdepfail_6_01'
+c.stats.file_suffix = 'weightdepfail'
 #######################################
 c.stats.rand_networks = 0
 
