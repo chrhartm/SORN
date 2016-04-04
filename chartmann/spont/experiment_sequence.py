@@ -48,7 +48,7 @@ class Experiment_sequence(AbstractExperiment):
                      ParamTrackerStat(),
                      EndWeightStat(),
                      InputUnitsStat(),
-                     MeanActivityStat(start=c.steps_plastic,
+                     MeanActivityStat(start=inputtrainsteps,
                       stop=c.N_steps,
                       N_indices=len(''.join((self.test_words)))+1,
                                     LFP=False),
